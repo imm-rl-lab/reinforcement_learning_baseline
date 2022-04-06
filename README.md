@@ -6,11 +6,13 @@ The following algorithms are considered:
 
 *Continuous action space:*
 
+- Cross-Entropy Method (CEM)
 - [Deep Deterministic Policy Gradient (DDPG)](https://arxiv.org/pdf/1509.02971.pdf)
 - [Normalized Adavtage Functions (NAF)](https://arxiv.org/pdf/1603.00748.pdf)
 
 *Discrete action space:*
 
+- Cross-Entropy Method (CEM)
 - [Deep Q-Network (DQN)](https://arxiv.org/pdf/1312.5602.pdf)
 - [Double Deep Q-Network (DDQN)](https://arxiv.org/pdf/1509.06461.pdf)
 
