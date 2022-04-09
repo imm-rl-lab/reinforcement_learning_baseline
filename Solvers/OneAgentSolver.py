@@ -14,7 +14,7 @@ def get_session(env, agent, session_len, agent_learning):
         session['rewards'].append(reward)
         session['dones'].append(done)
         
-        if agent_learning=='online':
+        if agent_learning=='by_fives':
             agent.fit(state, action, reward, done, next_state)
         
         state = next_state
@@ -26,14 +26,14 @@ def get_session(env, agent, session_len, agent_learning):
     return session
 
 
-def go(env, agent, show, episode_n, session_n=1, session_len=10000, agent_learning='offline'):
+def go(env, agent, show, episode_n, session_n=1, session_len=10000, agent_learning='by_fives'):
 
     for episode in range(episode_n):
         sessions = [get_session(env, agent, session_len, agent_learning) for i in range(session_n)]
 
         show(env, agent, episode, sessions)
         
-        #if agent_learning is 'offline':
-        #    agent.fit(sessions)
+        if agent_learning=='by_sessions':
+            agent.fit(sessions)
 
     return None
