@@ -82,10 +82,10 @@ class DDQN(DQN):
             #get targets
             q_values = self.q_model(states)
             targets = q_values.clone().detach()
-            next_q_values = self.q_model(next_states)
+            next_q_values = self.q_model(next_states).data.numpy()
             next_q_target_values = self.q_target_model(next_states).data.numpy()
             for i in range(self.batch_size):
-                next_max_action = torch.argmax(next_q_values[i])
+                next_max_action = np.argmax(next_q_values[i])
                 targets[i][actions[i]] = rewards[i] + self.gamma * (1 - dones[i]) * next_q_target_values[i][next_max_action]
             
             #learn q_model
