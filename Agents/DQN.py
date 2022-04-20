@@ -42,7 +42,7 @@ class DQN():
             for i in range(self.batch_size):
                 targets[i][actions[i]] = rewards[i] + self.gamma * (1 - dones[i]) * np.max(next_q_values[i])
             
-            #learn q_model
+            #train q_model
             loss = torch.mean((targets.detach() - q_values) ** 2)
             self.update_target_model(self.q_target_model, self.q_model, self.optimizer, loss)
 
