@@ -25,7 +25,6 @@ class DRQN_PartialHistory:
         self.session_memory = deque(maxlen=session_memory_len)
         self.previous_done = False
         self.hidden_queue = []
-        self.reset()
         
         return None
 
@@ -78,6 +77,9 @@ class DRQN_PartialHistory:
 
     def reset(self):
         self.hidden_queue = [self.get_initial_hiddens(1) for _ in range(self.history_len)]
+        self.noise.reset()
+        self.noise.reduce()
+        return None
 
     def add_to_memory(self, state, action, reward, done, next_state):
         
