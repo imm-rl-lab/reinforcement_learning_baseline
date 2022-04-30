@@ -66,8 +66,8 @@ class DDQN(DQN):
     def __init__(self, q_model, noise, q_model_lr=1e-3, gamma=1, 
                  batch_size=64, tau=1e-2, memory_len=50000):
         '''Double DQN'''
-        super().__init__(q_model, noise, q_model_lr=1e-3, gamma=1, 
-                 batch_size=64, tau=1e-2, memory_len=50000)
+        super().__init__(q_model, noise, q_model_lr=q_model_lr, gamma=gamma, 
+                 batch_size=batch_size, tau=tau, memory_len=memory_len)
         return None
                          
     def fit(self, state, action, reward, done, next_state):
@@ -88,7 +88,7 @@ class DDQN(DQN):
                 next_max_action = np.argmax(next_q_values[i])
                 targets[i][actions[i]] = rewards[i] + self.gamma * (1 - dones[i]) * next_q_target_values[i][next_max_action]
             
-            #learn q_model
+            #train q_model
             loss = torch.mean((targets.detach() - q_values) ** 2)
             self.update_target_model(self.q_target_model, self.q_model, self.optimizer, loss)
 
