@@ -96,7 +96,7 @@ class CEM_Discrete(CEM):
         elite_actions = torch.LongTensor(elite_actions)
         loss = func.cross_entropy(logits, elite_actions)
         
-        #learn
+        #train pi_model
         self.update_model(self.pi_model, self.optimizer, loss)
         return None
     
@@ -126,7 +126,7 @@ class CEM_Continuous(CEM):
         pred_actions = self.transform_interval(self.pi_model(elite_states))
         loss = torch.mean((pred_actions - elite_actions) ** 2)
         
-        #learn
+        #train pi_model
         self.update_model(self.pi_model, self.optimizer, loss)
         return None
     
