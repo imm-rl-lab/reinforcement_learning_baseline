@@ -24,7 +24,7 @@ class CEM():
         #get elite states and actions
         elite_states, elite_actions, elite_session_n = self.get_elite_states_and_actions(sessions)
         
-        #learn
+        #train
         if 0 < elite_session_n < len(sessions):
             for _ in range(self.learning_iter_per_fit):
                 self.update_policy(elite_states, elite_actions)
@@ -49,9 +49,9 @@ class CEM():
     def update_model(self, model, optimizer, loss):
         #gradient step
         copy_pi_midel = deepcopy(self.pi_model)
-        self.optimizer.zero_grad()
+        optimizer.zero_grad()
         loss.backward()
-        self.optimizer.step()
+        optimizer.step()
         
         #soft update
         for param, copy_param in zip(self.pi_model.parameters(), copy_pi_midel.parameters()):
