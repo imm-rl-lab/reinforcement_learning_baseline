@@ -41,10 +41,11 @@ class SimpleControlProblemVisualizer:
         plt.legend()
         plt.grid()
 
-        plt.subplot(224)
-        plt.plot(self.noise_thresholds, 'g', label='Порог шума u-агента')
-        plt.legend()
-        plt.grid()
+        if 'noise' in dir(agent):
+            plt.subplot(224)
+            plt.plot(self.noise_thresholds, 'g', label='Порог шума u-агента')
+            plt.legend()
+            plt.grid()
 
         clear_output(True)
         
@@ -54,7 +55,8 @@ class SimpleControlProblemVisualizer:
         total_reward = np.mean([sum(session['rewards']) for session in sessions])
         
         self.mean_total_rewards.append(total_reward)
-        self.noise_thresholds.append(agent.noise.threshold)
+        if 'noise' in dir(agent):
+            self.noise_thresholds.append(agent.noise.threshold)
         
         if episode % self.waiting_for_show ==0:
             self.show_fig(env, agent, sessions)
