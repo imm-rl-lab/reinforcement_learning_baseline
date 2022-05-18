@@ -37,3 +37,23 @@ def go(env, agent, show, episode_n, session_n=1, session_len=10000, agent_learni
             agent.fit(sessions)
 
     return None
+
+
+def go_asynchronously(env, agent, show, episode_n, session_n=1, session_len=10000, agent_learning=True):
+
+    for episode in range(episode_n):
+
+        all_sessions = []
+        session_array = []
+
+        for inner_agent in agent.inner_agents:
+            sessions = [get_session(env, inner_agent, session_len, agent_learning) for i in range(session_n)]
+            all_sessions.append(sessions)
+            session_array.extend(sessions)
+
+        if agent_learning:
+            agent.fit(all_sessions)
+
+        show(env, agent, episode, session_array)
+
+    return None
