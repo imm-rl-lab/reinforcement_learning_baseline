@@ -52,8 +52,9 @@ class A2C():
             last_done = session['dones'][-1]
             last_state = session['states'][-1]
             last_value = self.v_model(last_state)
-            returns = self.get_returns(session['rewards'], last_done, last_value)
-            returns.extend(returns)
+            current_returns = self.get_returns(session['rewards'], last_done, last_value)
+            
+            returns.extend(current_returns)
         
         #convert actions and returns to tensor
         if self.action_space_type == 'discrete':
