@@ -1,6 +1,9 @@
 # Finite-Horizon Control Problems
 
-We tends to realize stable versions of popular deep reinforcement learning algorithms and test their in Finite-Horizon Control Problems. Since all sessions have the same lengths in such problems, we find it reasonable to separate the processes of exploitation and learning. In other words, an agent does not learn on every steps, but it alternates an experience accumulation during several session and a multi-step learning.
+We tends to realize stable versions of popular deep reinforcement learning algorithms and test their in Finite-Horizon Control Problems.
+
+
+
 
 ## Agents
 
