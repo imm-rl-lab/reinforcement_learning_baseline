@@ -2,7 +2,7 @@
 
 We tends to realize stable versions of popular deep reinforcement learning algorithms and test their in Finite-Horizon Control Problems. Since all sessions have the same lengths in such problems, we find it reasonable to separate the processes of exploitation and learning. In other words, an agent does not learn on every steps, but it alternates an experience accumulation during several session and a multi-step learning.
 
-## Algorithms
+## Agents
 
 **Cross-Entropy Method (CEM)**
 - *paper: [The Differentiable Cross-Entropy Method](https://arxiv.org/pdf/1909.12830.pdf)*
