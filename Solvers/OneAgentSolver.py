@@ -26,7 +26,7 @@ def get_session(env, agent, session_len, agent_learning):
     return session
 
 
-def go(env, agent, show, episode_n, session_n=1, session_len=10000, agent_learning='by_sessions'):
+def go(env, agent, show, episode_n, session_n=1, session_len=10000, agent_learning='by_fives'):
 
     for episode in range(episode_n):
         sessions = [get_session(env, agent, session_len, agent_learning) for i in range(session_n)]
