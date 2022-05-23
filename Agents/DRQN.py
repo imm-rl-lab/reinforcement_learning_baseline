@@ -21,7 +21,7 @@ class DRQN_PartialHistory:
         self.q_target_model = copy.deepcopy(self.q_model)
         self.optimizer = torch.optim.Adam(self.q_model.parameters(), lr=q_model_lr)
 
-        self.session_memory = deque(maxlen=session_memory_len)
+        self.session_memory = deque([[]], maxlen=session_memory_len)
         self.new_session = True
         self.hidden_queue = []
 
@@ -93,10 +93,12 @@ class DRQN_PartialHistory:
         return None
 
     def add_to_memory(self, state, action, reward, done, next_state):
-        if not self.session_memory or self.session_memory[-1][-1][3]:
+        if not self.session_memory[-1]:
             self.session_memory.append([[state, action, reward, done, state]] * (self.history_len - 1))
 
         self.session_memory[-1].append([state, action, reward, done, next_state])
+        if done:
+            self.session_memory.append([])
         return None
 
     def get_history_batch(self):
@@ -138,7 +140,7 @@ class DRQN_WholeHistory:
         self.q_target_model = copy.deepcopy(self.q_model)
         self.optimizer = torch.optim.Adam(self.q_model.parameters(), lr=q_model_lr)
 
-        self.session_memory = deque(maxlen=session_memory_len)
+        self.session_memory = deque([[]], maxlen=session_memory_len)
         self.hidden = self.get_initial_state(1)
 
         return None
@@ -206,10 +208,9 @@ class DRQN_WholeHistory:
         return None
 
     def add_to_memory(self, state, action, reward, done, next_state):
-        if not self.session_memory or self.session_memory[-1][-1][3]:
-            self.session_memory.append([])
-
         self.session_memory[-1].append([state, action, reward, done, next_state])
+        if done:
+            self.session_memory.append([])
         return None
 
     def get_trajectories_batch(self):
