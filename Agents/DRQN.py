@@ -162,9 +162,10 @@ class DRQN_WholeHistory:
         if len(self.session_memory) >= 2:
             # get history batch
             trajectories = self.get_trajectories_batch()
+            trajectories_count = len(trajectories)
             sliced_trajectories = [[trajectory[k] for trajectory in trajectories] for k in range(self.trajectory_len)]
 
-            hidden = self.get_initial_state(self.batch_size)
+            hidden = self.get_initial_state(trajectories_count)
             loss = 0
             # hidden sweep
             for k in range(self.burning_len):
@@ -181,7 +182,7 @@ class DRQN_WholeHistory:
 
                 # get targets after burning
                 targets = q_values.clone()
-                for i in range(self.batch_size):
+                for i in range(trajectories_count):
                     targets[i][actions[i]] = rewards[i] + self.gamma * (1 - danes[i]) * max(next_q_values[i])
                 loss += torch.mean((targets.detach() - q_values) ** 2)
 
@@ -210,12 +211,14 @@ class DRQN_WholeHistory:
     def add_to_memory(self, state, action, reward, done, next_state):
         self.session_memory[-1].append([state, action, reward, done, next_state])
         if done:
+            if len(self.session_memory[-1]) < self.trajectory_len:
+                self.session_memory.pop()
             self.session_memory.append([])
         return None
 
     def get_trajectories_batch(self):
         # choice sessions in accordance with their lengths
-        session_weights = [len(session) - self.trajectory_len + 1 for session in self.session_memory]
+        session_weights = [max(len(session) - self.trajectory_len + 1, 0) for session in self.session_memory]
         sessions = random.choices(self.session_memory, weights=session_weights, k=self.batch_size)
 
         # fill trajectories batch
