@@ -5,13 +5,14 @@ import torch.nn.functional as F
 
 
 class A2C():
-    def __init__(self, pi_model, v_model,
+    def __init__(self, pi_model, v_model, noise,
                  gamma=0.99, pi_model_lr=1e-3, v_model_lr=1e-3,
                  entropy_threshold=1):
         self.pi_model = pi_model
         self.v_model = v_model
         self.gamma = gamma
         self.entropy_threshold = entropy_threshold
+        self.noise = noise
 
         self.pi_optimizer = torch.optim.Adam(self.pi_model.parameters(), pi_model_lr)
         self.v_optimizer = torch.optim.Adam(self.v_model.parameters(), v_model_lr)
@@ -81,11 +82,11 @@ class A2C():
 
 
 class A2C_Discrete(A2C):
-    def __init__(self, pi_model, v_model,
+    def __init__(self, pi_model, v_model, noise,
                  gamma=0.99, pi_model_lr=1e-3, v_model_lr=1e-3,
                  entropy_threshold=1):
         
-        super().__init__(pi_model, v_model, gamma, pi_model_lr, v_model_lr, entropy_threshold)
+        super().__init__(pi_model, v_model, noise, gamma, pi_model_lr, v_model_lr, entropy_threshold)
         return None
 
     def get_action(self, state):
@@ -102,11 +103,11 @@ class A2C_Discrete(A2C):
 
 
 class A2C_Continuous(A2C):
-    def __init__(self, action_min, action_max, pi_model, v_model,
+    def __init__(self, action_min, action_max, pi_model, v_model, noise,
                  gamma=0.99, pi_model_lr=1e-3, v_model_lr=1e-3,
                  entropy_threshold=1):
         
-        super().__init__(pi_model, v_model, gamma, pi_model_lr, v_model_lr, entropy_threshold)
+        super().__init__(pi_model, v_model, noise, gamma, pi_model_lr, v_model_lr, entropy_threshold)
         self.action_min = action_min
         self.action_max = action_max
         return None
