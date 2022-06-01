@@ -44,3 +44,32 @@ class SimpleControlProblem:
             done = True
         return self.state, reward, done, None
     
+    def g(self, state):
+        return np.array([[1]])
+    
+    def virtual_step(self, state, action):
+        action = np.clip(action, self.action_min, self.action_max)
+        
+        for _ in range(self.inner_step_n):
+            state = state + np.array([1, action[0]]) * self.inner_dt
+
+        reward = - self.r * action[0] ** 2 * self.dt
+        #reward = 0
+        done = False
+        if state[0] >= self.terminal_time - self.dt / 2:
+            reward -= state[1] ** 2
+            done = True
+        return state, reward, done, None
+    
+    def virtual_step_for_batch(self, states, actions):
+        actions = np.clip(actions, self.action_min, self.action_max)
+        for _ in range(self.inner_step_n):
+            f = np.column_stack([np.ones(states.shape[0]), actions[:, 0]])
+            states = states + f * self.inner_dt
+
+        rewards = - self.r * actions[:, 0] ** 2 * self.dt
+        dones = np.full(states.shape[0], 0)
+        rewards[states[:, 0] >= self.terminal_time] = -states[states[:, 0] >= self.terminal_time, 1] ** 2
+        dones[states[:, 0] >= self.terminal_time] = 1
+        return states, rewards, dones, _
+    
