@@ -27,3 +27,7 @@ We tends to realize stable versions of popular deep reinforcement learning algor
 **Asynchronous Advantage Actor-Critic (A3C)**
 - *paper: [Asynchronous Methods for Deep Reinforcement Learning](https://arxiv.org/pdf/1602.01783.pdf)*
 - *implementation: Alexander Chaikov*
+
+**Proximal Policy Optimization**
+- *paper: [Proximal Policy Optimization Algorithms](https://arxiv.org/pdf/1707.06347.pdf)*
+- *implementation: Sergeev Viktor*
