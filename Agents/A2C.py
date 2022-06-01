@@ -78,6 +78,8 @@ class A2C():
         pass
     
     def reset(self):
+        self.noise.reset()
+        self.noise.reduce()
         return None
 
 

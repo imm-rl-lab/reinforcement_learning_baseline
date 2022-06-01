@@ -16,6 +16,8 @@ def AsynchronousAgentMaker(agent, inner_agent_n=10):
 def asynchronous_fit(self, all_sessions):
     for agent, sessions in zip(self.inner_agents, all_sessions):
         agent.fit(sessions)
+        self.pi_optimizer.zero_grad()
+        self.v_optimizer.zero_grad()
         for local_pi_model, local_v_model, global_pi_model, global_v_model in zip(
                 agent.pi_model.parameters(),
                 agent.v_model.parameters(),
