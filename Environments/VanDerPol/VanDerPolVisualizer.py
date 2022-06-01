@@ -22,10 +22,10 @@ class VanDerPolVisualizer:
         plt.figure(figsize=[12, 12])
 
         plt.subplot(221)
-        plt.plot([state[0] for state in states], [state[1] for state in states], 'm--', label='Траектория движения')
-        plt.plot(states[-1][0],states[-1][1],'bo', label='Финальное состояние')
-        plt.xlim((0, env.terminal_time))
-        plt.ylim((-2, 2))
+        plt.plot([state[1] for state in states], [state[2] for state in states], 'm--', label='Траектория движения')
+        plt.plot(states[-1][1],states[-1][2],'bo', label='Финальное состояние')
+        plt.xlim((-5, 5))
+        plt.ylim((-5, 5))
         plt.grid()
         
         plt.subplot(222)
