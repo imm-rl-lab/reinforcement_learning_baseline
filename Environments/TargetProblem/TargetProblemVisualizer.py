@@ -29,7 +29,7 @@ class TargetProblemVisualizer:
         plt.plot([state[3] for state in states], [state[4] for state in states], 'm--', label='Траектория движения')
         plt.plot(env.xG,env.yG,'bo', label='Целевое состояние')
         plt.plot(states[-1][3],states[-1][4],'bo', label='Финальное состояние')
-        plt.xlim((0, 2.1))
+        plt.xlim((-3, 3))
         plt.ylim((-3, 3))
         plt.grid()
         
@@ -37,7 +37,7 @@ class TargetProblemVisualizer:
         plt.plot([state[1] for state in states], [state[2] for state in states], 'm--', label='Траектория движения')
         plt.plot(0,0,'bo', label='Целевое состояние')
         plt.plot(states[-1][1],states[-1][2],'bo', label='Финальное состояние')
-        plt.xlim((-2, 2))
+        plt.xlim((-3, 3))
         plt.ylim((-3, 3))
         plt.grid()
         
