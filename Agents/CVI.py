@@ -28,7 +28,7 @@ class VModelWithGradient(nn.Module):
         values = self.v_model(states)
         values.backward(gradient=torch.ones_like(values))
         gradient_values = states.grad[:, 1:].detach().unsqueeze(2)
-        g_values = torch.FloatTensor([self.g(state) for state in states])
+        g_values = torch.FloatTensor([self.g(state).transpose() for state in states])
         actions = 0.5 * (1 / self.r) * torch.matmul(g_values, gradient_values)[:, :, 0]
         return np.clip(actions.squeeze(0).detach().numpy(), self.action_min, self.action_max)
 
