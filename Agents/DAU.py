@@ -7,8 +7,8 @@ import random
 
 
 class DAU():
-    def __init__(self, v_model, a_model, noise, dt, v_model_lr=1e-3, a_model_lr=1e-3, gamma=1, batch_size=64,
-                 v_model_tau=1e-2, a_model_tau=1e-2, memory_len=50000):
+    def __init__(self, v_model, a_model, noise, dt, an, en, v_model_lr=1e-3, a_model_lr=1e-3, gamma=1, batch_size=64,
+                 v_model_tau=1e-3, a_model_tau=1e-3, memory_len=50000):
         super().__init__()
         self.v_model = v_model
         self.a_model = a_model
@@ -24,14 +24,22 @@ class DAU():
         self.a_target_model = deepcopy(self.a_model)
         self.v_optimizer = torch.optim.Adam(self.v_model.parameters(), lr=v_model_lr)
         self.a_optimizer = torch.optim.Adam(self.a_model.parameters(), lr=a_model_lr)
+
+        self.epsilon = 1
+        self.epsilon_delta = 1 / (en - 50)
+        self.action_n = an
         return None
 
     def get_action(self, state):
-        if np.random.uniform(0,1) < self.noise.threshold:
-            return self.noise.get()
-        else:
-            a_values, _ = self.a_model(state)
-            return torch.argmax(a_values)
+        actions = np.arange(self.action_n)
+        max_action = torch.argmax(self.a_model(state))
+        probs = np.ones(self.action_n) * self.epsilon / self.action_n
+        probs[max_action] += 1 - self.epsilon
+        for i in range(probs.size):
+            if probs[i] < 0:
+                probs[i] = 0
+        action = np.random.choice(actions, p=probs)
+        return action
 
     def fit(self, state, action, reward, done, next_state):
         """ Optimizes using the DAU variant of advantage updating.
@@ -48,32 +56,28 @@ class DAU():
             # get batch
             batch = random.sample(self.memory, self.batch_size)
             states, actions, rewards, dones, next_states = map(np.array, zip(*batch))
-            rewards = torch.FloatTensor(rewards)
 
             # get a values
             # A^*(s, a) = adv_function(s, a) - adv_function(s, max_action)
-            adv_values, _ = self.a_model(states)
-            action_a_values = torch.FloatTensor(self.batch_size)
-            max_action_a_values = torch.FloatTensor(self.batch_size)
+            adv_values = self.a_model(states)
+            a_values = torch.empty(self.batch_size, 1)
+            tz_rewards = torch.empty(self.batch_size, 1)
             for i in range(self.batch_size):
+                tz_rewards[i][0] = rewards[i]
                 max_action = torch.argmax(adv_values[i])
-                action_a_values[i] = adv_values[i][actions[i]]
-                max_action_a_values[i] = adv_values[i][max_action]
-            a_values = action_a_values - max_action_a_values
-            a_values = a_values.reshape(self.batch_size, 1)
+                a_values[i][0] = adv_values[i][actions[i]] - adv_values[i][max_action]
 
             # get targets
-            v_values, _ = self.v_model(states)
-            next_v_values, _ = self.v_target_model(next_states)
-            q_values = v_values + self.dt * a_values
-            targets = (rewards + (self.gamma ** self.dt) * next_v_values).detach()
+            v_values = self.v_model(states)
+            next_v_values = self.v_target_model(next_states)
+            q_values = (v_values + self.dt * a_values)
+            targets = (tz_rewards + (self.gamma ** self.dt) * next_v_values).detach()
 
             # train v_model and a_model
             critic_value = (q_values - targets) ** 2
             loss = critic_value.mean()
             self.update_target_models(self.v_target_model, self.v_model, self.v_optimizer, self.a_target_model,
                                       self.a_model, self.a_optimizer, loss)
-
         return None
 
     def update_target_models(self, v_target_model, v_model, v_optimizer, a_target_model, a_model, a_optimizer, loss):
