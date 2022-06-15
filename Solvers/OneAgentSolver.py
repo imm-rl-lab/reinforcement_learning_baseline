@@ -41,10 +41,11 @@ def go(env, agent, show, episode_n, session_n=1, session_len=10000, agent_learni
     for episode in range(episode_n):
         sessions = [get_session(env, agent, session_len, agent_learning, use_additional_info_in_sessions) for i in range(session_n)]
 
-        show(env, agent, episode, sessions)
-        
+        statistics = None
         if agent_learning=='by_sessions':
-            agent.fit(sessions)
+            statistics = agent.fit(sessions)
+
+        show(env, agent, episode, sessions, statistics=statistics)
 
     return None
 

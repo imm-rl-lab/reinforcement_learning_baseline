@@ -34,8 +34,7 @@ def ContinuousAgentMaker(DiscreteAgent):
                 for action in session['actions']:
                     actions.append(action.i)
                 session['actions'] = actions
-            super().fit(sessions)
-            return None
+            return super().fit(sessions)
 
         def fit_by_fives(self, state, action, reward, done, next_action):
             super().fit(state, action.i, reward, done, next_action)
