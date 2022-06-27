@@ -28,6 +28,12 @@ def ContinuousAgentMaker(DiscreteAgent):
             action.i = action_i
             return action
 
+        def get_dist_action(self, state):
+            dist, action_i = super().get_dist_action(state)
+            action = array_with_i(self.action_values[action_i])
+            action.i = action_i
+            return dist, action
+
         def fit_by_sessions(self, sessions):
             for session in sessions:
                 actions = []
