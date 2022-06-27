@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 
 class VanDerPol:
@@ -36,3 +37,22 @@ class VanDerPol:
             reward = - self.state[1] ** 2 - self.state[2] ** 2
         
         return self.state, reward, done, _
+
+    def virtual_step_for_batch(self, states, actions):
+        actions = np.clip(actions, self.action_min, self.action_max)
+        
+        for _ in range(self.inner_step_n):
+            dynamic = np.column_stack([np.ones(states.shape[0]), states[:, 2], 
+                                       (1 - states[:, 1] ** 2) * states[:, 2] - states[:, 1] + actions[:, 0]])
+            states = states + dynamic * self.inner_dt
+
+        dones = np.full(states.shape[0], False)
+        dones[states[:, 0] >= self.terminal_time - self.dt / 2] = True
+            
+        rewards = - self.r * actions[:, 0] ** 2 * self.dt
+        rewards[dones] = -states[dones, 1] ** 2 - states[dones, 2] ** 2
+        
+        return states, rewards, dones, _
+    
+    def g(self, state):
+        return np.array([[0, 1]])

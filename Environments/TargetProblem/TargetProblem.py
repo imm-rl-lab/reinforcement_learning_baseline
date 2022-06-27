@@ -6,7 +6,7 @@ from numpy.linalg import norm
 class TargetProblem:
     def __init__(self, action_radius=np.array([1, 1]),
                  initial_state=np.array([0, 0, 0, 0, 0, 0, 0]),
-                 terminal_time=10, dt=0.01, inner_step_n=10, target_point=(2, 2)):
+                 terminal_time=10, dt=1, inner_step_n=10, target_point=(2, 2)):
 
         self.state_dim = 7
         self.action_dim = 2
@@ -43,12 +43,6 @@ class TargetProblem:
         state_update[6] = - (self.k / self.m) * (y - y0) - self.g_const
         return state_update
 
-    def g(self, state):
-        t, x0, y0, x, y, vx, vy = state
-        return torch.stack(
-            [torch.ones(x.shape[0]), torch.ones(x.shape[0]), torch.zeros(x.shape[0]), torch.zeros(x.shape[0]),
-             torch.zeros(x.shape[0]), torch.zeros(x.shape[0])])
-
     def reset(self):
         self.state = self.initial_state
         return self.state
@@ -74,3 +68,33 @@ class TargetProblem:
             done = False
 
         return self.state, reward, done, None
+
+    def dynamic_for_batch(self, states, actions):
+        state_update = np.ones(states.shape)
+        state_update[:, 1] = actions[:, 0]
+        state_update[:, 2] = actions[:, 1]
+        state_update[:, 3] = states[:, 5]
+        state_update[:, 4] = states[:, 6]
+        state_update[:, 5] = - (self.k / self.m) * (states[:, 3] - states[:, 1])
+        state_update[:, 6] = - (self.k / self.m) * (states[:, 4] - states[:, 2]) - self.g_const
+        return state_update
+
+    def virtual_step_for_batch(self, states, actions):
+        for _ in range(self.inner_step_n):
+            k1 = self.dynamic_for_batch(states, actions)
+            k2 = self.dynamic_for_batch(states + k1 * self.inner_dt / 2, actions)
+            k3 = self.dynamic_for_batch(states + k2 * self.inner_dt / 2, actions)
+            k4 = self.dynamic_for_batch(states + k3 * self.inner_dt, actions)
+            states = states + (k1 + 2 * k2 + 2 * k3 + k4) * self.inner_dt / 6
+
+        dones = np.full(states.shape[0], False)
+        dones[states[:, 0] >= self.terminal_time - self.dt / 2] = True
+
+        rewards = - self.r * (norm(actions, axis=1) ** 2) * self.dt
+        rewards[dones] =- ((states[dones, 1] ** 2) + (states[dones, 2] ** 2) 
+                           + ((states[dones, 3] - self.xG) ** 2) + ((states[dones, 4] - self.yG) ** 2))
+
+        return states, rewards, dones, None
+    
+    def g(self, state):
+        return np.array([[1, 0], [0, 1], [0, 0], [0, 0], [0, 0], [0, 0]])
