@@ -1,20 +1,20 @@
 import numpy as np
 import random
 import torch
-from collections import deque
 from copy import deepcopy
+from Agents.Utilities.Buffers.ExperienceReplayBuffer import ExperienceReplayBuffer
 
 
 class DQN():
     def __init__(self, q_model, noise, q_model_lr=1e-3, gamma=1, 
-                 batch_size=64, tau=1e-2, memory_len=50000):
+                 batch_size=64, tau=1e-2, memory=ExperienceReplayBuffer(memory_len=100000)):
         self.q_model = q_model
         self.noise = noise
         self.gamma = gamma
         self.batch_size = batch_size
         self.tau = tau
 
-        self.memory = deque(maxlen=memory_len)
+        self.memory = memory
         self.q_target_model = deepcopy(self.q_model)
         self.optimizer = torch.optim.Adam(self.q_model.parameters(), lr=q_model_lr)
         return None
@@ -32,18 +32,20 @@ class DQN():
 
         if len(self.memory) >= self.batch_size:
             #get batch
-            batch = random.sample(self.memory, self.batch_size)
-            states, actions, rewards, dones, next_states = map(np.array, zip(*batch))
+            batch = self.memory.get_batch(self.batch_size)
+            states, actions, rewards, dones, next_states = list(zip(*batch))
+            actions = torch.LongTensor(actions)
+            rewards = torch.FloatTensor(rewards)
+            dones = torch.FloatTensor(dones)
             
-            #get targets
-            q_values = self.q_model(states)
-            targets = q_values.clone().detach()
-            next_q_values = self.q_target_model(next_states).data.numpy()
-            for i in range(self.batch_size):
-                targets[i][actions[i]] = rewards[i] + self.gamma * (1 - dones[i]) * np.max(next_q_values[i])
+            #get deltas
+            q_values = self.q_model(states)[torch.arange(self.batch_size), actions]
+            next_q_values = self.q_target_model(next_states).detach()
+            next_v_values = torch.max(next_q_values, dim=1).values
+            deltas = rewards + self.gamma * (1 - dones) * next_v_values - q_values
             
             #train q_model
-            loss = torch.mean((targets.detach() - q_values) ** 2)
+            loss = torch.mean(deltas ** 2)
             self.update_target_model(self.q_target_model, self.q_model, self.optimizer, loss)
 
         return None
