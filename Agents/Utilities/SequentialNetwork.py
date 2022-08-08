@@ -4,9 +4,11 @@ from torch import nn
 
 
 class SequentialNetwork(nn.Module):
-    def __init__(self, layers, hidden_activation=nn.ReLU(), output_activation=None, initial_weight_clip=3e-3):
+    def __init__(self, layers, hidden_activation=nn.ReLU(), output_activation=None, initial_weight_clip=3e-3, output_n=1):
         super().__init__()
         self.network = self.get_network(layers, hidden_activation, output_activation, initial_weight_clip)
+        self.layers = layers
+        self.output_n = output_n
         return None
 
     def get_network(self, layers, hidden_activation, output_activation, initial_weight_clip):
@@ -32,4 +34,9 @@ class SequentialNetwork(nn.Module):
     def forward(self, tensor):
         if type(tensor) is not torch.Tensor:
             tensor = torch.FloatTensor(tensor)
-        return self.network(tensor)
+        if self.output_n==1:
+            return self.network(tensor)
+        else:
+            output = self.network(tensor)
+            split_size = int(self.layers[-1]/self.output_n)
+            return torch.split(output, split_size, dim=1)
