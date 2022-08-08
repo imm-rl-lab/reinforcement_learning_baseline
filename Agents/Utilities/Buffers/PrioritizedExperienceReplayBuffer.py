@@ -31,7 +31,7 @@ class PrioritizedExperienceReplayBuffer():
     
     def get_weights(self, beta=0.5):
         priority_batch = np.array([self.priorities[i] for i in self.index_batch])
-        return (priority_batch / min(self.priorities)) ** beta
+        return (min(self.priorities) / priority_batch) ** beta
     
     def __len__(self):
         return len(self.values)
