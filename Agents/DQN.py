@@ -44,8 +44,15 @@ class DQN():
             next_v_values = torch.max(next_q_values, dim=1).values
             deltas = rewards + self.gamma * (1 - dones) * next_v_values - q_values
             
+            #get loss
+            if self.memory.name=='PrioritizedExperienceReplayBuffer':
+                self.memory.update_priorities(deltas.data.numpy())
+                weights = torch.FloatTensor(self.memory.get_weights())
+                loss = torch.mean(weights * deltas ** 2)
+            else:
+                loss = torch.mean(deltas ** 2)
+                
             #train q_model
-            loss = torch.mean(deltas ** 2)
             self.update_target_model(self.q_target_model, self.q_model, self.optimizer, loss)
 
         return None
