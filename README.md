@@ -28,10 +28,6 @@ We tends to realize stable versions of popular deep reinforcement learning algor
 - *paper: [Asynchronous Methods for Deep Reinforcement Learning](https://arxiv.org/pdf/1602.01783.pdf)*
 - *implementation: Alexander Chaikov*
 
-**Proximal Policy Optimization**
-- *paper: [Proximal Policy Optimization Algorithms](https://arxiv.org/pdf/1707.06347.pdf)*
-- *implementation: Sergeev Viktor*
-
 **Continuous Value Iteration (CVI)**
 - *paper: [Value Iteration in Continuous Actions, States and Time](https://arxiv.org/pdf/2105.04682.pdf)*
 - *implementation: Stepan Martyanov*
@@ -39,3 +35,7 @@ We tends to realize stable versions of popular deep reinforcement learning algor
 **Proximal Policy Optimization (PPO)**
 - *paper: [Proximal Policy Optimization Algorithmse](https://arxiv.org/pdf/1707.06347.pdf)*
 - *implementation: Viktor Sergeev*
+
+**Soft Actor-Critic (SAC)**
+- *papers: [Learning to Walk via Deep Reinforcement Learning](https://arxiv.org/pdf/1812.11103.pdf)*
+- *implementation: Anton Plaksin*
