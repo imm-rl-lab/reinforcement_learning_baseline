@@ -42,3 +42,4 @@ We tends to realize stable versions of popular deep reinforcement learning algor
 
 **Soft Actor-Critic (SAC)**
 - *papers: [Learning to Walk via Deep Reinforcement Learning](https://arxiv.org/pdf/1812.11103.pdf)*
+- *implementation: Anton Plaksin*
