@@ -39,3 +39,6 @@ We tends to realize stable versions of popular deep reinforcement learning algor
 **Proximal Policy Optimization (PPO)**
 - *paper: [Proximal Policy Optimization Algorithmse](https://arxiv.org/pdf/1707.06347.pdf)*
 - *implementation: Viktor Sergeev*
+
+**Soft Actor-Critic (SAC)**
+- *papers: [Learning to Walk via Deep Reinforcement Learning](https://arxiv.org/pdf/1812.11103.pdf)*
