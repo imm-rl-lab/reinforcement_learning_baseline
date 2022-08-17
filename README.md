@@ -1,11 +1,8 @@
-# Finite-Horizon Control Problems
+# Reinforcement Learning Baseline
 
-We tends to realize stable versions of popular deep reinforcement learning algorithms and test their in Finite-Horizon Control Problems.
+We tend to implement stable versions of popular deep reinforcement learning algorithms and test them in various problems.
 
-
-
-
-## Agents
+## Algorithms:
 
 **Cross-Entropy Method (CEM)**
 - *paper: [The Differentiable Cross-Entropy Method](https://arxiv.org/pdf/1909.12830.pdf)*
