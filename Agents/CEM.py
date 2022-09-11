@@ -24,7 +24,7 @@ class CEM():
         #get elite states and actions
         elite_states, elite_actions, elite_session_n = self.get_elite_states_and_actions(sessions)
         
-        #train
+        #learn
         if 0 < elite_session_n < len(sessions):
             for _ in range(self.learning_iter_per_fit):
                 self.update_policy(elite_states, elite_actions)
@@ -40,8 +40,9 @@ class CEM():
         elite_session_n = 0
         for session in sessions:
             if sum(session['rewards']) >= total_reward_threshold:
-                elite_states.extend(session['states'][:-1])
-                elite_actions.extend(session['actions'])
+                session_len = min(len(session['states']), len(session['actions']))
+                elite_states.extend(session['states'][:session_len])
+                elite_actions.extend(session['actions'][:session_len])
                 elite_session_n += 1
 
         return elite_states, elite_actions, elite_session_n
@@ -49,9 +50,9 @@ class CEM():
     def update_model(self, model, optimizer, loss):
         #gradient step
         copy_pi_midel = deepcopy(self.pi_model)
-        optimizer.zero_grad()
+        self.optimizer.zero_grad()
         loss.backward()
-        optimizer.step()
+        self.optimizer.step()
         
         #soft update
         for param, copy_param in zip(self.pi_model.parameters(), copy_pi_midel.parameters()):
@@ -96,7 +97,7 @@ class CEM_Discrete(CEM):
         elite_actions = torch.LongTensor(elite_actions)
         loss = func.cross_entropy(logits, elite_actions)
         
-        #train pi_model
+        #learn
         self.update_model(self.pi_model, self.optimizer, loss)
         return None
     
@@ -126,7 +127,7 @@ class CEM_Continuous(CEM):
         pred_actions = self.transform_interval(self.pi_model(elite_states))
         loss = torch.mean((pred_actions - elite_actions) ** 2)
         
-        #train pi_model
+        #learn
         self.update_model(self.pi_model, self.optimizer, loss)
         return None
     
